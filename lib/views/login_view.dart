@@ -1,6 +1,7 @@
 // LGGIN PAGE
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first/constants/routes.dart';
+import 'package:first/utilities/show_error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
@@ -74,13 +75,37 @@ class _LoginViewState extends State<LoginView> {
                       (route) => false,
                     );
                   } on FirebaseAuthException catch (e) {
-                    if (e.code == 'user-not-found') {
-                      devtools.log('User not found. Please register.');
-                    } else if (e.code == 'invalid-credential') {
-                      devtools.log('Invalid email or password entered');
+                    if (e.code == 'invalid-credential') {
+                      // ignore: use_build_context_synchronously
+                      await showErrorDialog(
+                        context,
+                        'Wrong email or password entered. Register if you have no account or check your credentials.',
+                      );
+                    } else if (e.code == 'channel-error') {
+                      // ignore: use_build_context_synchronously
+                      await showErrorDialog(
+                        context,
+                        'Please fill in all the fields',
+                      );
+                    } else if (e.code == 'invalid-email') {
+                      // ignore: use_build_context_synchronously
+                      await showErrorDialog(
+                        context,
+                        'Invalid email',
+                      );
                     } else {
-                      devtools.log('Code: ${e.code}');
+                      // ignore: use_build_context_synchronously
+                      await showErrorDialog(
+                        context,
+                        'Error: ${e.code}',
+                      );
                     }
+                  } catch (e) {
+                    // ignore: use_build_context_synchronously
+                    await showErrorDialog(
+                        context,
+                        e.toString()
+                      );
                   }
                 }),
           ),
@@ -96,3 +121,4 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 }
+
